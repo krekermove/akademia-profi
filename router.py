@@ -3,8 +3,6 @@ import os
 from fastapi import Request, Response, APIRouter
 import httpx
 from pydantic import BaseModel
-from dotenv import load_dotenv
-load_dotenv()
 
 TARGET_BACKEND_URL = "https://akademia-profi.bitrix24.ru/rest/"
 client = httpx.AsyncClient(base_url=TARGET_BACKEND_URL)
@@ -31,7 +29,8 @@ class CourseBody(BaseModel):
 
 @router.post("/get-courses")
 async def get_courses(request: Request, course: CourseBody):
-
+    print(courses_webhook["id"])
+    print(courses_webhook["token"])
     url = httpx.URL(path=f"{courses_webhook["id"]}/{courses_webhook["token"]}/crm.product.list.json", query=request.url.query.encode("utf-8"))
 
     body = {
@@ -91,10 +90,12 @@ class Lead(BaseModel):
     course: str
     cost: int
 
+manager = [12, 26, 28]
+counter = 0
 
 @router.post("/add-lead")
 async def add_lead(request: Request, lead: Lead):
-
+    global counter
     url = httpx.URL(path=f"{lead_webhook["id"]}/{lead_webhook["token"]}/crm.lead.add.json", query=request.url.query.encode("utf-8"))
 
     body = {
@@ -107,7 +108,7 @@ async def add_lead(request: Request, lead: Lead):
             "SOURCE_ID": "BOOKING",
             "COMMENTS": f"{lead.course}",
             "OPENED": "Y",
-            "ASSIGNED_BY_ID": 1,
+            "ASSIGNED_BY_ID": manager[counter],
             "CURRENCY_ID": "RUB",
             "OPPORTUNITY": f"{lead.cost}",
             "PHONE": [
@@ -127,6 +128,9 @@ async def add_lead(request: Request, lead: Lead):
             "REGISTER_SONET_EVENT": "Y"
         }
     }
+
+    if counter < 2: counter += 1
+    else: counter = 0
 
     try:
 
