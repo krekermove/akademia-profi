@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from fastapi import Request, Response, APIRouter
 import httpx
@@ -20,27 +21,23 @@ router = APIRouter(
     tags=["Курсы"],
 )
 
-
-class CourseBody(BaseModel):
-    category_id: int
-    name: str
-    count: int
-
-
 @router.get("/health")
 def health_check():
     return {"status": "ok"}
 
+
+class CourseBody(BaseModel):
+    name: str
+    count: int
+    category_id: Optional[int] = None
+
+
 @router.post("/get-courses")
 async def get_courses(request: Request, course: CourseBody):
-    print(courses_webhook["id"])
-    print(courses_webhook["token"])
     url = httpx.URL(path=f"{courses_webhook["id"]}/{courses_webhook["token"]}/crm.product.list.json", query=request.url.query.encode("utf-8"))
-
     body = {
         "filter": {
             "%NAME": f"{course.name}",
-            "PROPERTY_106": f"{course.category_id}"
         },
         "select": [
             "ID",
@@ -48,14 +45,16 @@ async def get_courses(request: Request, course: CourseBody):
             "ACTIVE",
             "PRICE",
             "SORT",
-            "PROPERTY_112"
-
+            "PROPERTY_112",
+            "PROPERTY_106"
         ],
         "order": {
             "ID": "ASC"
         },
-        "start": f"{course.count*50}"
+        "start": f"{course.count * 50}"
     }
+    if course.category_id:
+        body["filter"]["PROPERTY_106"] = f"{course.category_id}"
 
     try:
         rp = await client.request(
