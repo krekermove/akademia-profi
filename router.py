@@ -27,6 +27,10 @@ class CourseBody(BaseModel):
     count: int
 
 
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @router.post("/get-courses")
 async def get_courses(request: Request, course: CourseBody):
     print(courses_webhook["id"])

@@ -4,13 +4,16 @@ from router import router as auto_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-origins = ["*"]
+PROD_ORIGINS = [
+    "https://www.akademia-profi.ru",
+    "https://akademia-profi.ru",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=PROD_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
