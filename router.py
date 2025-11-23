@@ -53,7 +53,7 @@ async def get_courses(request: Request, course: CourseBody):
         },
         "start": f"{course.count * 50}"
     }
-    if course.category_id:
+    if course.category_id != 0:
         body["filter"]["PROPERTY_106"] = f"{course.category_id}"
 
     try:
