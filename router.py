@@ -46,7 +46,8 @@ async def get_courses(request: Request, course: CourseBody):
             "PRICE",
             "SORT",
             "PROPERTY_112",
-            "PROPERTY_106"
+            "PROPERTY_106",
+            "PROPERTY_116"
         ],
         "order": {
             "ID": "ASC"
